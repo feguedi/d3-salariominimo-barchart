@@ -13,6 +13,7 @@ async function init() {
         // const salarioMinimoData = []
         const width = 800
         const height = 400
+        const padding = 30
         const barWidth = width / 275
 
         const tooltip = d3.select('.visHolder')
@@ -33,29 +34,37 @@ async function init() {
 
         const data = await getSalarioMinimo()
 
-        console.log('Sí hay datos')
-
         const anios = data.map(dato => dato['Año'])
+        const salarios = data.map(dato => Number(String(dato['Salario mínimo real']).replace(',', '.')) || 0)
 
         svg.append('text')
             .attr('transform', 'rotate(-90)')
-            .attr('x', -200)
+            .attr('x', -300)
             .attr('y', 80)
             .text('Salario mínimo en México')
 
-        svg.append('text')
-            .attr('x', width / 2 + 120)
-            .attr('y', height + 50)
-            .text(`Sí jala este pedo (Max: ${d3.max(anios)}, Min: ${d3.min(anios)})`)
-            .attr('class', 'info')
-
         const xScale = d3.scaleLinear()
-            .domain([0, d3.max(anios)])
-        const xAxis = d3.axisBottom()
-        const yAxis = 2
+            .domain([d3.min(anios), d3.max(anios)])
+            .range([padding, width - padding])
 
-        svg.select('.visHolder')
-            .append('g')
+        const yScale = d3.scaleLinear()
+            .domain([0, d3.max(salarios)])
+            .range([height - padding, padding])
+
+        const xAxis = d3.axisBottom()
+            .scale(xScale)
+        const yAxis = d3.axisLeft()
+            .scale(yScale)
+
+        svg.append('g')
+            .attr('transform', `translate(${padding}, ${height - padding})`)
+            .attr('id', 'x-axis')
+            .call(xAxis)
+
+        svg.append('g')
+            .attr('transform', `translate(${padding * 2}, 0)`)
+            .attr('id', 'y-axis')
+            .call(yAxis)
 
     } catch (error) {
         console.error(error)
