@@ -37,13 +37,13 @@ async function init() {
 
         svg.append('text')
             .attr('x', width - (width / 2) - 80)
-            .attr('y', height + 50)
+            .attr('y', height + 20)
             .text('Fuente: https://www.datos.gob.mx/busca/dataset/salario-minimo-historico-1877-2019')
             .attr('class', 'info')
 
         svg.append('text')
-            .attr('x', width - (width / 2) - 80)
-            .attr('y', height + 70)
+            .attr('x', width - (width / 2) - 50)
+            .attr('y', height + 50)
             .text('Nota: entre los años 1879 a 1885 y entre 1912 a 1933 no hay datos registrados')
             .attr('class', 'info')
 
