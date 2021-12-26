@@ -29,7 +29,6 @@ async function init() {
             .append('svg')
             .attr('width', width + 100)
             .attr('height', height + 60)
-            .style('background-color', 'pink')
 
         const data = await getSalarioMinimo()
 
@@ -41,6 +40,13 @@ async function init() {
             .attr('x', -300)
             .attr('y', 80)
             .text('Salario mínimo en México')
+
+        svg.append('text')
+            .attr('x', width - (width / 2) - 80)
+            .attr('y', height + 50)
+            .text('Datos de: https://www.datos.gob.mx/busca/dataset/salario-minimo-historico-1877-2019')
+            .attr('class', 'info')
+
         const salarioMaximo = d3.max(salarios)
         const linearScale = d3.scaleLinear()
             .domain([0, salarioMaximo])
@@ -52,14 +58,12 @@ async function init() {
             .domain([d3.min(anios), d3.max(anios)])
             .range([padding, width - padding])
 
-        const yScale = d3.scaleLinear()
-            .domain([0, d3.max(salarios)])
-            .range([height - padding, padding])
-
         const xAxis = d3.axisBottom()
             .scale(xScale)
-        const yAxis = d3.axisLeft()
-            .scale(yScale)
+        const yAxisScale = d3.scaleLinear()
+            .domain([padding, salarioMaximo])
+            .range([height - padding, 0])
+        const yAxis = d3.axisLeft(yAxisScale)
 
         svg.append('g')
             .attr('transform', `translate(${padding}, ${height - padding})`)
@@ -79,23 +83,24 @@ async function init() {
             .attr('data-date', (d, i) => new Date(data[i]['Año'], 1))
             .attr('data-salario', (d, i) => Number(String(data[i]['Salario mínimo real']).replace(',', '.')) || 0)
             .attr('class', 'bar')
+            .attr('fill', 'rgb(10, 205, 10)')
             .attr('x', (d, i) => xScale(anios[i]))
-            .attr('y', d => height - d)
-            .attr('width', barWidth)
-            .attr('height', d => d)
+            .attr('y', d => d)
+            .attr('width', `${barWidth}px`)
+            .attr('height', (d, i) => Math.max(0, height - padding - d))
             .attr('index', (d, i) => i)
-            .attr('transform', 'translate(60, 0)')
+            .attr('transform', `translate(${padding}, 0)`)
             .on('mouseover', function(event, d) {
                 const i = this.getAttribute('index')
 
                 overlay.transition()
                     .duration(0)
-                    .style('height', d + 'px')
-                    .style('width', barWidth + 'px')
+                    .style('height', `${Math.max(0, height - padding - d)}px`)
+                    .style('width', `${barWidth}px`)
                     .style('opacity', 0.9)
-                    .style('left', i * barWidth + 0 + 'px')
-                    .style('top', height - d + 'px')
-                    .style('transform', 'translateX(60px)')
+                    .style('left', `${xScale(anios[i])}px`)
+                    .style('top', `${d}px`)
+                    .style('transform', `translateX(${padding}px)`)
 
                 tooltip.transition()
                     .duration(200)
@@ -103,9 +108,9 @@ async function init() {
 
                 tooltip.html(`${anios[i]}<br>$${salarios[i]} MXN`)
                     .attr('data-date', data[i]['Año'])
-                    .style('left', `${i * barWidth + 30}px`)
+                    .style('left', `${xScale(anios[i]) + 30}px`)
                     .style('top', `${height - 100}px`)
-                    .style('transform', 'translateX(60px)')
+                    .style('transform', `translateX(${padding}px)`)
             })
             .on('mouseout', () => {
                 tooltip.transition().duration(200).style('opacity', 0)
