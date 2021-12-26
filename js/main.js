@@ -36,15 +36,15 @@ async function init() {
         const salarios = data.map(dato => Number(String(dato['Salario mínimo real']).replace(',', '.')) || 0)
 
         svg.append('text')
-            .attr('transform', 'rotate(-90)')
-            .attr('x', -300)
-            .attr('y', 80)
-            .text('Salario mínimo en México')
+            .attr('x', width - (width / 2) - 80)
+            .attr('y', height + 50)
+            .text('Fuente: https://www.datos.gob.mx/busca/dataset/salario-minimo-historico-1877-2019')
+            .attr('class', 'info')
 
         svg.append('text')
             .attr('x', width - (width / 2) - 80)
-            .attr('y', height + 50)
-            .text('Datos de: https://www.datos.gob.mx/busca/dataset/salario-minimo-historico-1877-2019')
+            .attr('y', height + 70)
+            .text('Nota: entre los años 1879 a 1885 y entre 1912 a 1933 no hay datos registrados')
             .attr('class', 'info')
 
         const salarioMaximo = d3.max(salarios)
